@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cutlist Optimizer</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+        button {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cutlist Optimizer</h1>
+
+    <form action="/update_tables" method="post">
+        <!-- Available Stock Table -->
+        <h2>Available Stock</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Length</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stock in stocks %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>
+                        <input type="text" name="stock_lengths" value="{{ stock }}" placeholder="Enter length" />
+                    </td>
+                    <td>
+                        <button type="submit" name="action" value="delete_stock_{{ loop.index0 }}">Delete</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit" name="action" value="add_stock">Add Row</button>
+    
+        <!-- Required Cuts Table -->
+        <h2>Required Cuts</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Length</th>
+                    <th>Quantity</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cut in cuts %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>
+                        <input type="text" name="cut_lengths" value="{{ cut['length'] }}" placeholder="Enter length" />
+                    </td>
+                    <td>
+                        <input type="text" name="cut_quantities" value="{{ cut['quantity'] }}" placeholder="Enter quantity" />
+                    </td>
+                    <td>
+                        <button type="submit" name="action" value="delete_cut_{{ loop.index0 }}">Delete</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit" name="action" value="add_cut">Add Row</button>
+    </form>
+    
+</body>
+</html>
