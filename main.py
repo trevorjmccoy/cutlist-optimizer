@@ -1,65 +1,34 @@
-from fastapi import FastAPI, Request, Form, HTTPException
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi import FastAPI, Request, Form
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel
-from optimizer import first_fit, best_fit
+from typing import List
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
-# Mock data to store table rows
-rows = [{"length": "", "width": "", "quantity": ""}]
-
-stocks = [""]
-cuts = [""]
-
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request, "rows": rows, "stocks": stocks, "cuts": cuts})
+    return templates.TemplateResponse("index.html", {"request": request})
 
-
-@app.post("/update_tables")
-async def update_tables(
-    action: str = Form(...),
-    stock_lengths: list[str] = Form(default_factory=list),
-    cut_lengths: list[str] = Form(default_factory=list),
-    cut_quantities: list[str] = Form(default_factory=list)
+@app.post("/submit-form")
+async def run_optimizer(
+    request: Request,
+    stock_lengths: List[float] = Form(...),
+    stock_quantities: List[int] = Form(...),
+    cut_lengths: List[float] = Form(...),
+    cut_quantities: List[int] = Form(...),
 ):
-    global stocks, cuts
+    form_data = await request.form()
+    
+    # Extract cut_plus_values with unique names
+    cut_plus_values = [
+        int(value) for key, value in form_data.items() if key.startswith("cut_plus_values_")
+    ]
 
-    # Update stocks
-    stocks = stock_lengths or []
-
-    # Update cuts
-    cuts = [{"length": l, "quantity": q} for l, q in zip(cut_lengths, cut_quantities)]
-
-    # Handle actions
-    if action == "add_stock":
-        stocks.append("")
-    elif action.startswith("delete_stock_"):
-        index = int(action.split("_")[2])
-        if 0 <= index < len(stocks):
-            stocks.pop(index)
-
-    if action == "add_cut":
-        cuts.append({"length": "", "quantity": ""})
-    elif action.startswith("delete_cut_"):
-        index = int(action.split("_")[2])
-        if 0 <= index < len(cuts):
-            cuts.pop(index)
-
-    # Return updated page
-    return templates.TemplateResponse("index.html", {"request": {}, "stocks": stocks, "cuts": cuts})
-
-
-
-
-
-
-@app.post("/run_best_fit")
-async def run_best_fit():
-    # Implement your best fit algorithm using `stocks` and `cuts`
-    # optimized_layout = best_fit_algorithm(stocks, cuts)
-    # Store or display the result
-    # return 
-    pass
+    return JSONResponse({
+        "stock_lengths": stock_lengths,
+        "stock_quantities": stock_quantities,
+        "cut_lengths": cut_lengths,
+        "cut_quantities": cut_quantities,
+        "cut_plus_values": cut_plus_values
+    })

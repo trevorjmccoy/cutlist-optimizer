@@ -60,20 +60,21 @@ def best_fit(bin_size, items):
 
     return bins, oversized_message   
 
+if __name__ == '__main__':
 
-item_list = [9,5,2,3,6,7,1,1,3,6,9,7,8,8,4,6,5,5]
-#print('First Fit Tests: ')
-#print(first_fit(10, item_list))
-#print(first_fit(30, item_list))
-#print(first_fit(50, item_list))
-#print(first_fit(8, item_list))
-#print(first_fit(4, item_list))
+    item_list = [9,5,2,3,6,7,1,1,3,6,9,7,8,8,4,6,5,5]
+    print('First Fit Tests: ')
+    print(first_fit(10, item_list))
+    print(first_fit(30, item_list))
+    print(first_fit(50, item_list))
+    print(first_fit(8, item_list))
+    print(first_fit(4, item_list))
 
-#print('')
+    print('')
 
-#print('Best Fit Tests: ')
-#print(best_fit(10, item_list))
-#print(best_fit(30, item_list))
-#print(best_fit(50, item_list))
-#print(best_fit(8, item_list))
-#print(best_fit(4, item_list))
+    print('Best Fit Tests: ')
+    print(best_fit(10, item_list))
+    print(best_fit(30, item_list))
+    print(best_fit(50, item_list))
+    print(best_fit(8, item_list))
+    print(best_fit(4, item_list))

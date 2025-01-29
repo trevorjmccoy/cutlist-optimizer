@@ -23,63 +23,80 @@
 <body>
     <h1>Cutlist Optimizer</h1>
 
-    <form action="/update_tables" method="post">
+    <form action="/submit-form" method="post" enctype="multipart/form-data">
         <!-- Available Stock Table -->
         <h2>Available Stock</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Length</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for stock in stocks %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>
-                        <input type="text" name="stock_lengths" value="{{ stock }}" placeholder="Enter length" />
-                    </td>
-                    <td>
-                        <button type="submit" name="action" value="delete_stock_{{ loop.index0 }}">Delete</button>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <button type="submit" name="action" value="add_stock">Add Row</button>
-    
-        <!-- Required Cuts Table -->
-        <h2>Required Cuts</h2>
-        <table>
+        <table id="stocks">
             <thead>
                 <tr>
                     <th>#</th>
                     <th>Length</th>
                     <th>Quantity</th>
-                    <th>Actions</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
-                {% for cut in cuts %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>
-                        <input type="text" name="cut_lengths" value="{{ cut['length'] }}" placeholder="Enter length" />
-                    </td>
-                    <td>
-                        <input type="text" name="cut_quantities" value="{{ cut['quantity'] }}" placeholder="Enter quantity" />
-                    </td>
-                    <td>
-                        <button type="submit" name="action" value="delete_cut_{{ loop.index0 }}">Delete</button>
-                    </td>
-                </tr>
-                {% endfor %}
+                <!-- Rows will be dynamically added -->
             </tbody>
         </table>
-        <button type="submit" name="action" value="add_cut">Add Row</button>
+        <button type="button" onclick="addRow('stocks')">Add Row</button>
+
+        <!-- Required Cuts Table -->
+        <h2>Required Cuts</h2>
+        <table id="cuts">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Length</th>
+                    <th>Quantity</th>
+                    <th>Plus</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be dynamically added -->
+            </tbody>
+        </table>
+        <button type="button" onclick="addRow('cuts')">Add Row</button>
+
+        <br><br>
+        <button type="submit">Run Optimization</button>
     </form>
-    
+
+    <script>
+        function addRow(tableId) {
+            const table = document.getElementById(tableId).querySelector('tbody');
+            const rowCount = table.rows.length + 1;
+
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${rowCount}</td>
+                <td><input type="number" step="any" name="${tableId === 'stocks' ? 'stock_lengths' : 'cut_lengths'}" placeholder="Enter length" required /></td>
+                <td><input type="number" name="${tableId === 'stocks' ? 'stock_quantities' : 'cut_quantities'}" placeholder="Enter quantity" required /></td>
+                ${tableId === 'cuts' ? `
+                    <td>
+                        <input type="radio" name="cut_plus_values_${rowCount}" value="0" checked />
+                        <label>|____|</label>
+                        <input type="radio" name="cut_plus_values_${rowCount}" value="1" />
+                        <label>/____/</label>
+                        <input type="radio" name="cut_plus_values_${rowCount}" value="2" />
+                        <label>\\____/</label>
+                    </td>` : ''}
+                <td><button type="button" onclick="deleteRow(this)">Delete</button></td>
+            `;
+            table.appendChild(newRow);
+        }
+
+        function deleteRow(button) {
+            const row = button.closest('tr');
+            row.remove();
+
+            // Update row numbers
+            const table = row.closest('tbody');
+            Array.from(table.rows).forEach((row, index) => {
+                row.cells[0].innerText = index + 1;
+            });
+        }
+    </script>
 </body>
 </html>
