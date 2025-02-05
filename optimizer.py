@@ -1,80 +1,70 @@
-def first_fit(bin_size, items):
-    bins = [[]]
-    oversized_items = []
-
-    for item in items:
-        # catch items larger than max bin size
-        if item > bin_size:
-            oversized_items.append(item)
-            continue
-
-        else:
-            # try to place item in available bin
-            for bin in bins:
-                if item <= bin_size - sum(bin):
-                    bin.append(item)
-                    break
-            # no bin found; create new bin
-            else:
-                bins.append([item])
-
-    if oversized_items:
-        oversized_message = f"The following items are larger than the maximum available bin size: {oversized_items}"
-    else:
-        oversized_message = "All items fit within the bins"
-
-    return bins, oversized_message   
+def best_fit(depth, stocks_lengths, stocks_quantities, cuts_lengths, cuts_quantities, cuts_left_wall_angles, cuts_right_wall_angles):
+    from math import tan, radians, ceil
+    # Expand stocks and cuts into pieces
+    stocks = []
+    cuts = []
+    overhangs_left = [(tan(radians(90 - (angle / 2))) * depth) for angle in cuts_left_wall_angles]
+    overhangs_right = [(tan(radians(90 - (angle / 2))) * depth) for angle in cuts_right_wall_angles]
     
+    for length, quantity in zip(stocks_lengths, stocks_quantities):
+        stocks.extend([length] * quantity)
 
+    for length, quantity, overhang_left, overhang_right in zip(cuts_lengths, cuts_quantities, overhangs_left, overhangs_right):
+        cuts.extend([ceil((length + overhang_left + overhang_right) * 1000) / 1000] * quantity)
 
-def best_fit(bin_size, items):
-    bins = [[]]
-    oversized_items = []
+    stocks.sort(reverse=True)
+    cuts.sort(reverse=True)
 
-    for item in items:
-        # catch items larger than max bin size
-        if item > bin_size:
-            oversized_items.append(item)
-            continue
+    result = {} 
 
+    # Check for impossible cases
+    if cuts and stocks and cuts[0] > stocks[0]:
+        return "One or more required cuts are larger than the available stock."
+
+    # Initialize result with stocks
+    for i, stock in enumerate(stocks):
+        result[i] = [stock, [], stock]  # [original stock length, list of cuts, remaining length]
+
+    # Allocate cuts
+    for cut in cuts:
+        best_fit_index = None
+        min_remaining_space = float('inf')
+
+        for index, value in result.items():
+            remaining_space = value[2] - cut
+
+            # Find the stock that minimizes remaining space after placement
+            if remaining_space >= 0 and remaining_space < min_remaining_space:
+                best_fit_index = index
+                min_remaining_space = remaining_space
+
+        # If a suitable stock was found, place the cut
+        if best_fit_index is not None:
+            result[best_fit_index][1].append(cut)
+            result[best_fit_index][2] -= cut
         else:
-            # check all bins to find the one with the tightest fit
-            best_bin_index = -1
-            min_space_left = bin_size + 1
-            for i, bin in enumerate(bins):
-                available_space = bin_size - sum(bin)
-                if available_space >= item and available_space < min_space_left:
-                    best_bin_index = i
-                    min_space_left = available_space
-            
-            # place the item in the bin with the tightest fit. If no bin can fit the item, create a new bin and place the item there
-            if best_bin_index == -1:
-                bins.append([item])
-            else:
-                bins[best_bin_index].append(item)
+            return "Not enough stock to accommodate cuts."
 
-    if oversized_items:
-        oversized_message = f"The following items are larger than the maximum available bin size: {oversized_items}"
-    else:
-        oversized_message = "All items fit within the bins"
-
-    return bins, oversized_message   
+    # Format output (remove remaining length)
+    final_result = {k: [v[0], v[1]] for k, v in result.items()}
+    
+    return final_result
+   
 
 if __name__ == '__main__':
 
-    item_list = [9,5,2,3,6,7,1,1,3,6,9,7,8,8,4,6,5,5]
-    print('First Fit Tests: ')
-    print(first_fit(10, item_list))
-    print(first_fit(30, item_list))
-    print(first_fit(50, item_list))
-    print(first_fit(8, item_list))
-    print(first_fit(4, item_list))
+    depth = 3
+    stocks_lengths = [1000,2000,300,400,500]
+    stocks_quantities = [1,2,3,4,5]
+    cuts_lengths = [100,200,300,400,500]
+    cuts_quantities = [1,2,3,4,5]
+    cuts_left_wall_angles = [90,66,45,120,180]
+    cuts_right_wall_angles = [45,180,90,66,120]
 
-    print('')
+    print(best_fit(stocks_lengths, stocks_quantities, cuts_lengths, cuts_quantities, cuts_left_wall_angles, cuts_right_wall_angles, depth))
 
-    print('Best Fit Tests: ')
-    print(best_fit(10, item_list))
-    print(best_fit(30, item_list))
-    print(best_fit(50, item_list))
-    print(best_fit(8, item_list))
-    print(best_fit(4, item_list))
+    
+
+
+
+

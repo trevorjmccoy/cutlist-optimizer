@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Request, Form
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from typing import List
+from optimizer import best_fit
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -13,22 +14,25 @@ async def index(request: Request):
 @app.post("/submit-form")
 async def run_optimizer(
     request: Request,
-    stock_lengths: List[float] = Form(...),
-    stock_quantities: List[int] = Form(...),
-    cut_lengths: List[float] = Form(...),
-    cut_quantities: List[int] = Form(...),
-):
-    form_data = await request.form()
-    
-    # Extract cut_plus_values with unique names
-    cut_plus_values = [
-        int(value) for key, value in form_data.items() if key.startswith("cut_plus_values_")
-    ]
+    depth: float = Form(),
+    stocks_lengths: List[float] = Form(...),
+    stocks_quantities: List[int] = Form(...),
+    cuts_lengths: List[float] = Form(...),
+    cuts_quantities: List[int] = Form(...),
+    cuts_left_wall_angles: List[str] = Form(...),
+    cuts_right_wall_angles: List[str] = Form(...)
+):  
+    # Replace empty values with 180 while keeping valid numbers
+    cuts_left_wall_angles = [float(angle) if angle.strip() else 180 for angle in cuts_left_wall_angles]
+    cuts_right_wall_angles = [float(angle) if angle.strip() else 180 for angle in cuts_right_wall_angles]
 
-    return JSONResponse({
-        "stock_lengths": stock_lengths,
-        "stock_quantities": stock_quantities,
-        "cut_lengths": cut_lengths,
-        "cut_quantities": cut_quantities,
-        "cut_plus_values": cut_plus_values
-    })
+    # Sort cuts into stocks leaving as little spare as possible
+    return best_fit(
+        depth, 
+        stocks_lengths, 
+        stocks_quantities, 
+        cuts_lengths, 
+        cuts_quantities, 
+        cuts_left_wall_angles, 
+        cuts_right_wall_angles
+    )
