@@ -27,7 +27,7 @@ async def run_optimizer(
     cuts_right_wall_angles = [float(angle) if angle.strip() else 180 for angle in cuts_right_wall_angles]
 
     # Sort cuts into stocks leaving as little spare as possible
-    return best_fit(
+    result = best_fit(
         depth, 
         stocks_lengths, 
         stocks_quantities, 
@@ -36,3 +36,4 @@ async def run_optimizer(
         cuts_left_wall_angles, 
         cuts_right_wall_angles
     )
+    return templates.TemplateResponse("result.html", {"request": request, "result": result})

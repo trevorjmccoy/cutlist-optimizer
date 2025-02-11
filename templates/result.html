@@ -3,9 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Result</title>
+    <style>
+        body {
+            background-color: #fefae0;
+        }
+        /* Container that holds all bins; width is relative to the viewport */
+        .stock-container {
+            width: 90%;          /* Use 90% of the viewport width */
+            max-width: 600px;    /* But do not exceed 600px on larger displays */
+            margin: 20px auto;   /* Centered with some vertical spacing */
+        }
+        /* Style for the individual bin (the bar itself) */
+        .stock {
+            width: 100%;         /* Occupies the full width of the container */
+            height: 30px;
+            margin: 10px 0;
+            border: 1px solid #d4a373;
+            display: flex;       /* Arrange segments horizontally */
+        }
+        /* Style for each segment (each item or empty space) */
+        .segment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            box-sizing: border-box;
+        }
+        .segment-text {
+            color: #000000;
+            font-size: 0.9em;
+        }
+        /* Color for item segments */
+        .cut {
+            background-color: #e9edc9;
+            border: 3px solid #ccd5ae
+        }
+        /* Color for the empty space */
+        .empty {
+            background-color: #faedcd;
+        }
+        /* Example of a media query for smaller displays */
+        @media (max-width: 600px) {
+            .stock {
+                height: 25px;  /* Slightly reduce height on smaller screens */
+            }
+        }
+        .error-message {
+            color: #ff0000;
+        }
+      </style>
 </head>
 <body>
-    
+    <h1> Optimized Cuts Visualization</h1>
+    {% if result.error is defined %}
+        <div class="error-message">{{ result.error }}</div>
+    {% else %}
+        <!-- Loop through each stock in the result dictionary -->
+        {% for stock_num, stock_data in result.items() %}
+            {% set stock_size = stock_data[0] %}
+            {% set cuts = stock_data[1] %}
+            {% set total_used = cuts | sum %}
+            {% set remaining = stock_data[2] %}
+
+            <div>
+                <strong>#{{ loop.index }} - {{ stock_size }}</strong>
+            </div>
+        
+            <!-- Draw the stock container -->
+            <div class="stock">
+                <!-- For each item, calculate its width percentage relative to the bin's capacity -->
+                {% for cut in cuts %}
+                    {% set percentage = (cut / stock_size) * 100 %}
+                    <div class="segment cut" style="width: {{ percentage }}%;" title="Cut: {{ cut }}"><span class="segment-text">{{ cut }}</span></div>
+                {% endfor %}
+                <!-- Represent the remaining (unused) space -->
+                {% if remaining >0 %}
+                    {% set rem_percentage = (remaining / stock_size) * 100 %}
+                    <div class="segment empty" style="width: {{ rem_percentage }}%;" title="Empty: {{ remaining }}"><span class="segment-text">{{ remaining }}</span></div>
+                {% endif %}
+            </div>
+            
+        {% endfor %}
+    {% endif %}
+        
 </body>
 </html>
