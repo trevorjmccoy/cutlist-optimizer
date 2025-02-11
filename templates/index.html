@@ -33,10 +33,10 @@
 
         <!-- Depth & Blade Kerf Table -->
         <label for="depth">Moulding depth: </label>
-        <input type="number" id="depth" name="depth" placeholder="depth" required>
+        <input type="number" step="any" id="depth" name="depth" placeholder="ex: 3.5">
 
         <label for="kerf">Blade kerf: </label>
-        <input type="number" id="kerf" name="kerf" placeholder="kerf">
+        <input type="number" step="any" id="kerf" name="kerf" placeholder="ex: .625">
         <!-- Available Stock Table -->
         <h2>Available Stock</h2>
         <table id="stocks">
@@ -106,6 +106,19 @@
                 row.cells[0].innerText = index + 1;
             });
         }
+
+        // If kerf or depth are empty, assign default values
+        document.querySelector("form").addEventListener("submit", function (event) {
+            const kerfInput = document.getElementById("kerf");
+            const depthInput = document.getElementById("depth");
+
+            if (kerfInput.value.trim() === "") {
+                kerfInput.value = 0;
+            }
+            if (depthInput.value.trim() === "") {
+                depthInput.value = 0;
+            }
+        });
     </script>
 </body>
 </html>

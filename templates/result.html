@@ -39,6 +39,11 @@
             background-color: #e9edc9;
             border: 3px solid #ccd5ae
         }
+        /* Color for kerf segments */
+        .kerf {
+            background-color: #e69384;
+            border: 3px solid #d07e7e
+        }
         /* Color for the empty space */
         .empty {
             background-color: #faedcd;
@@ -62,7 +67,6 @@
         <!-- Loop through each stock in the result dictionary -->
         {% for stock_num, stock_data in result.items() %}
             {% set stock_size = stock_data[0] %}
-            {% set cuts = stock_data[1] %}
             {% set total_used = cuts | sum %}
             {% set remaining = stock_data[2] %}
 
@@ -73,12 +77,17 @@
             <!-- Draw the stock container -->
             <div class="stock">
                 <!-- For each item, calculate its width percentage relative to the bin's capacity -->
-                {% for cut in cuts %}
-                    {% set percentage = (cut / stock_size) * 100 %}
-                    <div class="segment cut" style="width: {{ percentage }}%;" title="Cut: {{ cut }}"><span class="segment-text">{{ cut }}</span></div>
+                {% for kerf, cut in stock_data[1] %}
+                    {% set kerf_percentage = (kerf / stock_size) * 100 %}
+                    {% set cut_percentage = (cut / stock_size) * 100 %}
+
+                    {% if kerf > 0 %}
+                        <div class="segment kerf" style="width: {{ kerf_percentage}}%;" title="Kerf: {{ kerf }}"></div>
+                    {% endif %}
+                    <div class="segment cut" style="width: {{ cut_percentage }}%;" title="Cut: {{ cut }}"><span class="segment-text">{{ cut }}</span></div>
                 {% endfor %}
                 <!-- Represent the remaining (unused) space -->
-                {% if remaining >0 %}
+                {% if remaining > 0 %}
                     {% set rem_percentage = (remaining / stock_size) * 100 %}
                     <div class="segment empty" style="width: {{ rem_percentage }}%;" title="Empty: {{ remaining }}"><span class="segment-text">{{ remaining }}</span></div>
                 {% endif %}

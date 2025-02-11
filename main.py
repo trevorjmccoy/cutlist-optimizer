@@ -15,6 +15,7 @@ async def index(request: Request):
 async def run_optimizer(
     request: Request,
     depth: float = Form(),
+    kerf: float = Form(),
     stocks_lengths: List[float] = Form(...),
     stocks_quantities: List[int] = Form(...),
     cuts_lengths: List[float] = Form(...),
@@ -28,7 +29,8 @@ async def run_optimizer(
 
     # Sort cuts into stocks leaving as little spare as possible
     result = best_fit(
-        depth, 
+        depth,
+        kerf,
         stocks_lengths, 
         stocks_quantities, 
         cuts_lengths, 
@@ -36,4 +38,5 @@ async def run_optimizer(
         cuts_left_wall_angles, 
         cuts_right_wall_angles
     )
+
     return templates.TemplateResponse("result.html", {"request": request, "result": result})

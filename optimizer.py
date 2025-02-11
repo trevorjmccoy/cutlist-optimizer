@@ -1,4 +1,4 @@
-def best_fit(depth, stocks_lengths, stocks_quantities, cuts_lengths, cuts_quantities, cuts_left_wall_angles, cuts_right_wall_angles):
+def best_fit(depth, kerf, stocks_lengths, stocks_quantities, cuts_lengths, cuts_quantities, cuts_left_wall_angles, cuts_right_wall_angles):
     from math import tan, radians, ceil, floor
     # Expand stocks and cuts into pieces
     stocks = []
@@ -31,17 +31,25 @@ def best_fit(depth, stocks_lengths, stocks_quantities, cuts_lengths, cuts_quanti
         min_remaining_space = float('inf')
 
         for index, value in result.items():
-            remaining_space = value[2] - cut
+            # Check if the stock already has a cut.
+            if value[1]:
+                remaining_space = value[2] - (kerf + cut)
+            else:
+                remaining_space = value[2] - cut
 
-            # Find the stock that minimizes remaining space after placement
+            # Find the stock that minimizes the remaining space after placement.
             if remaining_space >= 0 and remaining_space < min_remaining_space:
                 best_fit_index = index
                 min_remaining_space = remaining_space
 
-        # If a suitable stock was found, place the cut
+        # If a suitable stock was found, place the cut.
         if best_fit_index is not None:
-            result[best_fit_index][1].append(cut)
-            result[best_fit_index][2] -= cut
+            if result[best_fit_index][1]:
+                result[best_fit_index][1].append((kerf, cut))
+                result[best_fit_index][2] -= (kerf + cut)
+            else:
+                result[best_fit_index][1].append((0, cut))
+                result[best_fit_index][2] -= cut
         else:
             return {"error": "Not enough stock to accommodate cuts."}
         
