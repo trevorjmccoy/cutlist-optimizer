@@ -1,5 +1,5 @@
 def best_fit(depth, stocks_lengths, stocks_quantities, cuts_lengths, cuts_quantities, cuts_left_wall_angles, cuts_right_wall_angles):
-    from math import tan, radians, ceil
+    from math import tan, radians, ceil, floor
     # Expand stocks and cuts into pieces
     stocks = []
     cuts = []
@@ -19,7 +19,7 @@ def best_fit(depth, stocks_lengths, stocks_quantities, cuts_lengths, cuts_quanti
 
     # Check for impossible cases
     if cuts and stocks and cuts[0] > stocks[0]:
-        return "One or more required cuts are larger than the available stock."
+        return {"error": "One or more required cuts are larger than the available stock."}
 
     # Initialize result with stocks
     for i, stock in enumerate(stocks):
@@ -43,10 +43,14 @@ def best_fit(depth, stocks_lengths, stocks_quantities, cuts_lengths, cuts_quanti
             result[best_fit_index][1].append(cut)
             result[best_fit_index][2] -= cut
         else:
-            return "Not enough stock to accommodate cuts."
+            return {"error": "Not enough stock to accommodate cuts."}
+        
+    # Round down remaining_space for better display
+    for v in result.values():
+        v[2] = floor(v[2] * 1000) / 1000
 
-    # Format output (remove remaining length)
-    final_result = {k: [v[0], v[1]] for k, v in result.items()}
+    # Remove empty stock
+    final_result = {k: v for k, v in result.items() if v[1]!= []}
     
     return final_result
    
