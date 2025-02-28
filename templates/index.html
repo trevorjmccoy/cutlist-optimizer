@@ -7,6 +7,7 @@
     <style>
         body{
             background-color: #fefae0;
+            margin: 15%;
         }
         table {
             border-collapse: collapse;
@@ -17,26 +18,50 @@
             border: 1px solid #ccd5ae;
             background-color: #e9edc9;
             padding: 8px;
-            text-align: center;
+            text-align: left;
         }
         button {
-            margin: 5px;
+            margin: 0px;
             background-color: #ccd5ae;
-            border: 1px solid #adb593;
+            border: 2px solid #adb593;
+            border-radius: 10px;
         }
+        button:hover {
+            margin: 0px;
+            background-color: #bdc6a0;
+            border: 2px solid #92987c;
+        }
+        table input {
+            box-sizing: border-box;
+        }
+        .delete-button {
+            width: 30px;
+            height: 30px;
+            font-size: larger;
+            color: #eb1d1d;
+            background-color: #f28080;
+            border: 1px solid #eb1d1d;
+            border-radius: 10%;
+        }
+        .delete-button:hover {
+            color: #f28080;
+            background-color: #e24040;
+            border: 1px solid #f28080;
+        }
+
     </style>
 </head>
 <body>
-    <h1>Cutlist Optimizer</h1>
+    <h1>Moulding/Trim Stock Optimizer</h1>
 
     <form action="/submit-form" method="post" enctype="multipart/form-data">
 
         <!-- Depth & Blade Kerf Table -->
         <label for="depth">Moulding depth: </label>
-        <input type="number" step="any" id="depth" name="depth" placeholder="ex: 3.5">
+        <input type="number" step="any" id="depth" name="depth" placeholder="ex: 3.5" min="0">
 
         <label for="kerf">Blade kerf: </label>
-        <input type="number" step="any" id="kerf" name="kerf" placeholder="ex: .625">
+        <input type="number" step="any" id="kerf" name="kerf" placeholder="ex: .625" min="0">
         <!-- Available Stock Table -->
         <h2>Available Stock</h2>
         <table id="stocks">
@@ -50,6 +75,13 @@
             </thead>
             <tbody>
                 <!-- Rows will be dynamically added -->
+                <tr>
+                    <td>1</td>
+                    <td><input type="number" step="any" name="stocks_lengths" placeholder="Enter length" min="0" required /></td>
+                    <td><input type="number" name="stocks_quantities" placeholder="Enter quantity" min="0" /></td>
+
+                    <td><button type="button" class="delete-button" onclick="deleteRow(this)">X</button></td>
+                </tr>
             </tbody>
         </table>
         <button type="button" onclick="addRow('stocks')">Add Row</button>
@@ -68,49 +100,66 @@
             </thead>
             <tbody>
                 <!-- Rows will be dynamically added -->
+                <tr>
+                    <td>1</td>
+                    <td><input type="number" step="any" name="cuts_lengths" placeholder="Enter length" min="0" required /></td>
+                    <td><input type="number" name="cuts_quantities" placeholder="Enter quantity" min="0" /></td>
+                    <td>
+                        <input type="number" step="any" name="cuts_left_wall_angles" placeholder="Left" min="0" max="180"/>
+                        <input type="number" step="any" name="cuts_right_wall_angles" placeholder="Right" min="0" max="180"/>
+                    </td>
+                    <td><button type="button" class="delete-button" onclick="deleteRow(this)">X</button></td>
+                </tr>
             </tbody>
         </table>
         <button type="button" onclick="addRow('cuts')">Add Row</button>
 
         <br><br>
-        <button type="submit">Run Optimization</button>
+        <button type="submit" style="margin-top: 20px;">Run Optimization</button>
     </form>
 
     <script>
         function addRow(tableId) {
-            const table = document.getElementById(tableId).querySelector('tbody');
-            const rowCount = table.rows.length + 1;
-
+            const tbody = document.getElementById(tableId).querySelector('tbody');
             const newRow = document.createElement('tr');
             newRow.innerHTML = `
-                <td>${rowCount}</td>
-                <td><input type="number" step="any" name="${tableId === 'stocks' ? 'stocks_lengths' : 'cuts_lengths'}" placeholder="Enter length" required /></td>
-                <td><input type="number" name="${tableId === 'stocks' ? 'stocks_quantities' : 'cuts_quantities'}" placeholder="Enter quantity" required /></td>
+                <td></td>
+                <td><input type="number" step="any" name="${tableId === 'stocks' ? 'stocks_lengths' : 'cuts_lengths'}" placeholder="Enter length" min="0" required /></td>
+                <td><input type="number" name="${tableId === 'stocks' ? 'stocks_quantities' : 'cuts_quantities'}" placeholder="Enter quantity" min="0" /></td>
                 ${tableId === 'cuts' ? `
                     <td>
-                        <input type="number" step="any" name="cuts_left_wall_angles" placeholder="Left" min="1" max="180"/>
-                        <input type="number" step="any" name="cuts_right_wall_angles" placeholder="Right" min="1" max="180"/>
+                        <input type="number" step="any" name="cuts_left_wall_angles" placeholder="Left" min="0" max="180"/>
+                        <input type="number" step="any" name="cuts_right_wall_angles" placeholder="Right" min="0" max="180"/>
                     </td>` : ''}
-                <td><button type="button" onclick="deleteRow(this)">Delete</button></td>
+                <td><button type="button" class="delete-button" onclick="deleteRow(this)">X</button></td>
             `;
-            table.appendChild(newRow);
-        }
+            tbody.appendChild(newRow);
 
-        function deleteRow(button) {
-            const row = button.closest('tr');
-            row.remove();
-
-            // Update row numbers
-            const table = row.closest('tbody');
-            Array.from(table.rows).forEach((row, index) => {
+            // Re-number all rows
+            Array.from(tbody.rows).forEach((row, index) => {
                 row.cells[0].innerText = index + 1;
             });
         }
 
-        // If kerf or depth are empty, assign default values
+        function deleteRow(button) {
+            // Get the tbody element from the button's context before removing the row
+            const tbody = button.closest('tbody');
+            const row = button.closest('tr');
+            row.remove();
+
+            // re-number the remaining rows
+            Array.from(tbody.rows).forEach((row, index) => {
+                row.cells[0].innerText = index + 1;
+            });
+        }
+        // Assign empty values to 0 in order to keep valid input type restrictions and reassign values server-side
         document.querySelector("form").addEventListener("submit", function (event) {
             const kerfInput = document.getElementById("kerf");
             const depthInput = document.getElementById("depth");
+            const stocksQuantitiesInputs = document.getElementsByName("stocks_quantities");
+            const cutsQuantitiesInputs = document.getElementsByName("cuts_quantities");
+            const cutsLeftWallAnglesInputs = document.getElementsByName("cuts_left_wall_angles");
+            const cutsRightWallAnglesInputs = document.getElementsByName("cuts_right_wall_angles");
 
             if (kerfInput.value.trim() === "") {
                 kerfInput.value = 0;
@@ -118,6 +167,27 @@
             if (depthInput.value.trim() === "") {
                 depthInput.value = 0;
             }
+            stocksQuantitiesInputs.forEach(input => {
+                if (input.value.trim() === "") {
+                    input.value = 0;
+                }
+            });
+            // Assign empty to 1 assuming any cut length will have at least one cut
+            cutsQuantitiesInputs.forEach(input => {
+                if (input.value.trim() === "") {
+                    input.value = 1;
+                }
+            });            
+            cutsLeftWallAnglesInputs.forEach(input => {
+                if (input.value.trim() === "") {
+                    input.value = 0;
+                }
+            });
+            cutsRightWallAnglesInputs.forEach(input => {
+                if (input.value.trim() === "") {
+                    input.value = 0;
+                }
+            });
         });
     </script>
 </body>
