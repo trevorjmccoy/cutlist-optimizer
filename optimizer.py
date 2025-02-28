@@ -13,6 +13,34 @@ def best_fit(depth, kerf, stocks_lengths, stocks_quantities, cuts_lengths, cuts_
         cuts.extend([ceil((length + overhang_left + overhang_right) * 1000) / 1000] * quantity)
 
     stocks.sort(reverse=True)
+
+
+
+# MAYBE PUT THIS IN MY BEST FIT ALGO SOMEWHERE IN THE CASE THAT THERE ARE FEW 12FT STOCK AND MANY F8 FT STOCK, FOR EXAMPLE
+    def breakdown_oversized_cut(cut):
+
+        # Break down cut into (quotient) number of the largest available stock and add to cuts list
+        quotient_remainder = divmod(cut, stocks[0])
+        cuts.extend([stocks[0]] * int(quotient_remainder[0]))
+        leftover = ceil((quotient_remainder[1] + (quotient_remainder[0] * (tan(radians(45)) * depth))) * 1000) / 1000
+
+        # If leftover is too large, break it down too. If not, add it to cuts list
+        if leftover > stocks[0]:
+            breakdown_oversized_cut(leftover)
+        else:
+            cuts.append(leftover)
+
+        # Remove oversized cut from cuts list
+        cuts.remove(cut)
+
+
+    # Break down oversized cuts into usable lengths
+    for cut in cuts.copy():
+        if cut > stocks[0]:
+            breakdown_oversized_cut(cut)
+
+
+
     cuts.sort(reverse=True)
 
     result = {} 
