@@ -7,6 +7,23 @@
     <style>
         body {
             background-color: #fefae0;
+            margin: 10%;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        button {
+            margin-top: 40px;
+            background-color: #ccd5ae;
+            border: 2px solid #adb593;
+            border-radius: 10px;
+        }
+        button:hover {
+            margin-top: 40px;
+            background-color: #bdc6a0;
+            border: 2px solid #92987c;
         }
         /* Container that holds all bins; width is relative to the viewport */
         .stock-container {
@@ -95,6 +112,21 @@
             
         {% endfor %}
     {% endif %}
-        
+    
+    <div class="button-container">
+        <button onclick="downloadPDF()">Download as PDF</button>
+
+        <button onclick="backToHome()">Back to home</button>
+    </div>
+   
+
+    <script>
+        function downloadPDF() {
+            window.location.href = "/download-pdf/";
+        }
+        function backToHome() {
+            window.location.href = "/"
+        }
+    </script>
 </body>
 </html>
