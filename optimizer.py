@@ -79,7 +79,7 @@ def best_fit(depth, kerf, stocks_lengths, stocks_quantities, cuts_lengths, cuts_
                 result[best_fit_index][1].append((0, cut))
                 result[best_fit_index][2] -= cut
         else:
-            return {"error": "Not enough stock to accommodate cuts."}
+            return {"error": "Not enough stock to accommodate cuts - Return to home and try again"}
         
     # Round down remaining_space for better display
     for v in result.values():
