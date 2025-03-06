@@ -1,5 +1,6 @@
 import secrets
 from fastapi import FastAPI, Request, Form
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, Response
 from fastapi.templating import Jinja2Templates
 from weasyprint import HTML
@@ -8,6 +9,8 @@ from typing import List
 from optimizer import best_fit
 
 app = FastAPI()
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Set up secret key to allow for user-specific states
 secret_key = secrets.token_urlsafe(32)
@@ -35,7 +38,7 @@ async def run_optimizer(
     cuts_left_wall_angles = [180 if angle == 0 else angle for angle in cuts_left_wall_angles]
     cuts_right_wall_angles = [180 if angle == 0 else angle for angle in cuts_right_wall_angles]
 
-    # Allow empty stock quantities to represent an essentially infinite quantity (input max is 9999)
+    # Allow empty stock quantities to represent an infinite number available (9999 should be large enough without outrageously increasing load time)
     stocks_quantities = [9999 if quantity == 0 else quantity for quantity in stocks_quantities]
 
     # Sort cuts into stocks leaving as little spare as possible
