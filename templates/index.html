@@ -5,9 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cutlist Optimizer</title>
     <style>
-        body{
+        html, body {
+            margin: 0;
+            padding: 0;
             background-color: #fefae0;
+        }
+        .banner {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccd5ae;
+            background-color: #dbe1b5;
+            padding: 10px 20px;
+        }
+        .banner-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        .banner h1 {
+            font-size: 24px;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+        .content{
             margin: 15%;
+            margin-top: 5%;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+        ul {
+        list-style-type: disc;
+        margin-left: 20px;
         }
         table {
             border-collapse: collapse;
@@ -49,74 +77,97 @@
             border: 1px solid #f28080;
         }
 
+
     </style>
 </head>
 <body>
-    <h1>Moulding/Trim Stock Optimizer</h1>
 
-    <form action="/submit-form" method="post" enctype="multipart/form-data">
+    <div class="banner">
+        <img src="../static/images/moulding-icon.png" alt="Website Icon" class="banner-icon">
+        <h1>Moulding/Trim Stock Optimizer</h1>
+    </div>
 
-        <!-- Depth & Blade Kerf Table -->
-        <label for="depth">Moulding depth: </label>
-        <input type="number" step="any" id="depth" name="depth" placeholder="ex: 3.5" min="0">
+    <div class="content">
+        <h1>Welcome to the Moulding/Trim Linear Cut List Calculator</h1>
+        <p>Your go-to tool for optimizing material cuts and minimizing waste. Follow these simple steps to use the Cutlist Optimizer:</p>
+        <ul>
+            <li><strong>Input Your Details:</strong> Enter the dimensions and quantities of your raw material and the pieces you need. If you dont have a set number of raw materials, leave the available stock quantity empty and the tool will tell you exactly how many you will need to complete your project. (*) indicates a required field</li>
+            <li><strong>Configure Options:</strong> Adjust the following settings to further refine your results:
+                <ul>
+                    <li><strong>Moulding Depth</strong> - the distance between the wall and the proudest point of your trim</li>
+                    <li><strong>Blade Kerf</strong> - the width of material that is removed by your sawblade</li>
+                    <li><strong>Exterior Corner Angle</strong> - the angle where two walls meet on either side of a piece you need. Exterior corner angles and moulding depth work together to determine the extra length necessary for the pieces to meet properly. <strong>Any interior corner angles should be left empty.</strong> </li>
+                </ul>
+            </li>
+            <li><strong>Optimize Your Layout:</strong> With a click, the tool computes the most efficient way to cut your material, helping you make the most of every inch and reducing scrap.</li>
+            <li><strong>Review and Save:</strong> Once optimized, the detailed cutlist can be downloaded as a PDF to be shared or printed for use in your workshop.</li>
+        </ul>
+        <p style="margin-bottom: 40px;">Whether you're a seasoned professional or tackling your first project, this calculator streamlines your planning process, ensuring accuracy and saving both time and resources. Enjoy a smarter, more efficient approach to your moulding projects!</p>
 
-        <label for="kerf">Blade kerf: </label>
-        <input type="number" step="any" id="kerf" name="kerf" placeholder="ex: .625" min="0">
-        <!-- Available Stock Table -->
-        <h2>Available Stock</h2>
-        <table id="stocks">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Length</th>
-                    <th>Quantity</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Rows will be dynamically added -->
-                <tr>
-                    <td>1</td>
-                    <td><input type="number" step="any" name="stocks_lengths" placeholder="Enter length" min="0" required /></td>
-                    <td><input type="number" name="stocks_quantities" placeholder="Enter quantity" min="0" /></td>
+        <form action="/submit-form" method="post" enctype="multipart/form-data">
 
-                    <td><button type="button" class="delete-button" onclick="deleteRow(this)">X</button></td>
-                </tr>
-            </tbody>
-        </table>
-        <button type="button" onclick="addRow('stocks')">Add Row</button>
+            <!-- Depth & Blade Kerf Input -->
+            <label for="depth">Moulding depth: </label>
+            <input type="number" step="any" id="depth" name="depth" placeholder="ex: 3.5" min="0">
 
-        <!-- Required Cuts Table -->
-        <h2>Required Cuts</h2>
-        <table id="cuts">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Length</th>
-                    <th>Quantity</th>
-                    <th>Exterior corner angle</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Rows will be dynamically added -->
-                <tr>
-                    <td>1</td>
-                    <td><input type="number" step="any" name="cuts_lengths" placeholder="Enter length" min="0" required /></td>
-                    <td><input type="number" name="cuts_quantities" placeholder="Enter quantity" min="0" /></td>
-                    <td>
-                        <input type="number" step="any" name="cuts_left_wall_angles" placeholder="Left" min="0" max="180"/>
-                        <input type="number" step="any" name="cuts_right_wall_angles" placeholder="Right" min="0" max="180"/>
-                    </td>
-                    <td><button type="button" class="delete-button" onclick="deleteRow(this)">X</button></td>
-                </tr>
-            </tbody>
-        </table>
-        <button type="button" onclick="addRow('cuts')">Add Row</button>
+            <label for="kerf">Blade kerf: </label>
+            <input type="number" step="any" id="kerf" name="kerf" placeholder="ex: .625" min="0">
+            <!-- Available Stock Table -->
+            <h2>Available Stock</h2>
+            <table id="stocks">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Length*</th>
+                        <th>Quantity</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows will be dynamically added -->
+                    <tr>
+                        <td>1</td>
+                        <td><input type="number" step="any" name="stocks_lengths" placeholder="Enter length" min="0" required /></td>
+                        <td><input type="number" name="stocks_quantities" placeholder="Enter quantity" min="0" /></td>
 
-        <br><br>
-        <button type="submit" style="margin-top: 20px;">Run Optimization</button>
-    </form>
+                        <td><button type="button" class="delete-button" onclick="deleteRow(this)">X</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="button" onclick="addRow('stocks')">Add Row</button>
+
+            <!-- Required Cuts Table -->
+            <h2>Required Cuts</h2>
+            <table id="cuts">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Length*</th>
+                        <th>Quantity</th>
+                        <th>Exterior Corner Angle</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows will be dynamically added -->
+                    <tr>
+                        <td>1</td>
+                        <td><input type="number" step="any" name="cuts_lengths" placeholder="Enter length" min="0" required /></td>
+                        <td><input type="number" name="cuts_quantities" placeholder="Enter quantity" min="0" /></td>
+                        <td>
+                            <input type="number" step="any" name="cuts_left_wall_angles" placeholder="Left" min="0" max="180"/>
+                            <input type="number" step="any" name="cuts_right_wall_angles" placeholder="Right" min="0" max="180"/>
+                        </td>
+                        <td><button type="button" class="delete-button" onclick="deleteRow(this)">X</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="button" onclick="addRow('cuts')">Add Row</button>
+
+            <br><br>
+            <button type="submit" style="margin-top: 20px;">Run Optimization</button>
+        </form>
+    </div>
 
     <script>
         function addRow(tableId) {
