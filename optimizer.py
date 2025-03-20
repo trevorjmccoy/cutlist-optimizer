@@ -1,5 +1,6 @@
+from math import tan, radians, ceil, floor
+
 def best_fit(depth, kerf, stocks_lengths, stocks_quantities, cuts_lengths, cuts_quantities, cuts_left_wall_angles, cuts_right_wall_angles):
-    from math import tan, radians, ceil, floor
     # Expand stocks and cuts into pieces
     stocks = []
     cuts = []
