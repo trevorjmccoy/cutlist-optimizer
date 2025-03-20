@@ -1,4 +1,5 @@
 import secrets
+import uvicorn
 from fastapi import FastAPI, Request, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, Response
@@ -75,3 +76,7 @@ async def download_pdf(request: Request):
         media_type="application/pdf", 
         headers={"Content-Disposition": "attachment; filename=page.pdf"}
     )
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="127.0.0.1", port=8000)
