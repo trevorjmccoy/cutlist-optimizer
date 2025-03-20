@@ -1,0 +1,63 @@
+body {
+    background-color: #fefae0;
+    margin: 10%;
+}
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+button {
+    margin-top: 40px;
+    background-color: #ccd5ae;
+    border: 2px solid #adb593;
+    border-radius: 10px;
+}
+button:hover {
+    margin-top: 40px;
+    background-color: #bdc6a0;
+    border: 2px solid #92987c;
+}
+/* Container that holds all bins; width is relative to the viewport */
+.stock-container {
+    width: 90%;
+    max-width: 600px;
+    margin: 20px auto;
+}
+/* Style for the individual bin (the bar itself) */
+.stock {
+    width: 100%;
+    height: 30px;
+    margin: 10px 0;
+    border: 1px solid #d4a373;
+    display: flex;
+}
+/* Style for each segment (each item or empty space) */
+.segment {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    box-sizing: border-box;
+}
+.segment-text {
+    color: #000000;
+    font-size: 0.9em;
+}
+/* Color for item segments */
+.cut {
+    background-color: #e9edc9;
+    border: 3px solid #ccd5ae
+}
+/* Color for kerf segments */
+.kerf {
+    background-color: #e69384;
+    border: 3px solid #d07e7e
+}
+/* Color for the empty space */
+.empty {
+    background-color: #faedcd;
+}
+.error-message {
+    color: #ff0000;
+}
